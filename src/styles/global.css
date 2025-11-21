@@ -1,0 +1,82 @@
+/* src/styles/global.css */
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* 依然使用这套经典的配色，但它们现在只代表颜色本身 */
+  --color-rhine-bg: #f2f3f5;
+  --color-rhine-surface: #ffffff;
+  --color-rhine-dark: #1a1a1a;
+  --color-rhine-green: #8cc63f;
+  
+  --font-mono: "JetBrains Mono", "Menlo", monospace;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  /* 定义缓慢旋转动画 */
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes spin-reverse {
+    from { transform: rotate(360deg); }
+    to { transform: rotate(0deg); }
+  }
+}
+
+@layer base {
+  /* 强制隐藏系统光标 (配合之前的 CustomCursor) */
+  @media (pointer: fine) {
+    html, body, * { cursor: none !important; }
+    input, textarea, [contenteditable="true"] { cursor: text !important; }
+  }
+
+  body {
+    @apply bg-rhine-bg text-rhine-dark font-sans overflow-x-hidden;
+    
+    /* 1. 基础底纹：极淡的科技网格 */
+    background-image: 
+        linear-gradient(rgba(26, 26, 26, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26, 26, 26, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* 2. 背景核心：巨大的旋转同心圆 (模拟数据雷达/离心机) */
+  body::before {
+    content: "";
+    position: fixed;
+    top: -25%;
+    left: -15%;
+    width: 90vh;
+    height: 90vh;
+    border-radius: 50%;
+    border: 1px solid rgba(140, 198, 63, 0.05); /* 极淡的绿色 */
+    z-index: -1;
+    /* 多重光环效果 */
+    box-shadow: 
+        0 0 0 40px rgba(255, 255, 255, 0.6),
+        0 0 0 41px rgba(26, 26, 26, 0.02),
+        0 0 0 150px rgba(255, 255, 255, 0.2),
+        0 0 0 151px rgba(26, 26, 26, 0.02);
+    animation: spin-slow 80s linear infinite;
+    pointer-events: none;
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    bottom: -20%;
+    right: -10%;
+    width: 70vh;
+    height: 70vh;
+    border-radius: 50%;
+    border: 1px dashed rgba(26, 26, 26, 0.05);
+    z-index: -1;
+    animation: spin-reverse 100s linear infinite;
+    pointer-events: none;
+  }
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #8cc63f; }

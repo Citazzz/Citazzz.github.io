@@ -1,0 +1,90 @@
+---
+const currentPath = Astro.url.pathname;
+
+// 辅助函数：判断路由是否激活
+const isActive = (path: string) => {
+    if (path === '/') return currentPath === '/';
+    return currentPath.startsWith(path);
+};
+---
+
+<aside class="fixed left-0 top-0 h-screen w-64 flex flex-col z-50 hidden md:flex bg-rhine-bg/90 backdrop-blur border-r border-gray-200 font-sans">
+    <!-- 1. 顶部 Logo 区：旋转的数据环 -->
+    <div class="h-32 flex flex-col items-center justify-center border-b border-gray-200 relative overflow-hidden">
+        <!-- 装饰性旋转环 -->
+        <div class="absolute inset-0 border-[20px] border-gray-100 rounded-full scale-150 opacity-50 animate-[spin-slow_20s_linear_infinite]"></div>
+        
+        <div class="relative z-10 text-center">
+            <div class="text-2xl font-black tracking-tighter text-rhine-dark">CITAZZZ</div>
+            <div class="text-[10px] font-mono text-rhine-green tracking-[0.3em] uppercase">Terminal</div>
+        </div>
+    </div>
+
+    <!-- 2. 导航菜单：连接线风格 -->
+    <nav class="flex-1 py-8 px-6 space-y-6">
+        <div class="space-y-1">
+            <div class="text-[10px] font-mono text-gray-400 mb-3 pl-2">/// SYSTEM_NAV</div>
+            
+            {[
+                { name: 'DASHBOARD', path: '/', id: '01' },
+                { name: 'ARCHIVES', path: '/blog', id: '02' },
+                { name: 'PROFILE', path: '/profile', id: '03' }
+            ].map(item => (
+                <a href={item.path} class="group block relative pl-8 py-3 cursor-none">
+                    <!-- 激活状态指示灯 -->
+                    <div class={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full transition-all duration-300 ${isActive(item.path) ? 'bg-rhine-green shadow-[0_0_8px_#8cc63f]' : 'bg-gray-300 group-hover:bg-gray-400'}`}></div>
+                    
+                    <!-- 连接线 (激活时变绿变长) -->
+                    <div class={`absolute left-1.5 top-1/2 -translate-y-1/2 h-[1px] bg-gray-200 transition-all duration-500 ${isActive(item.path) ? 'w-6 bg-rhine-green' : 'w-3 group-hover:w-4'}`}></div>
+
+                    <div class="flex items-baseline justify-between pl-2 transition-transform duration-300 group-hover:translate-x-1">
+                        <span class={`text-sm font-bold tracking-wide transition-colors ${isActive(item.path) ? 'text-rhine-dark' : 'text-gray-500 group-hover:text-rhine-dark'}`}>
+                            {item.name}
+                        </span>
+                        <span class="text-[10px] font-mono text-gray-300 group-hover:text-rhine-green transition-colors">
+                            {item.id}
+                        </span>
+                    </div>
+                </a>
+            ))}
+        </div>
+    </nav>
+
+    <!-- 3. 底部状态区：纯数据展示 -->
+    <div class="p-8 text-[10px] font-mono text-gray-400 space-y-2">
+        <div class="flex justify-between">
+            <span>CPU</span>
+            <span class="text-rhine-dark">NORMAL</span>
+        </div>
+        <div class="flex justify-between">
+            <span>NET</span>
+            <span class="text-rhine-green">CONNECTED</span>
+        </div>
+        <div class="h-px w-full bg-gray-200 my-2"></div>
+        <div class="flex justify-between items-center">
+            <span>LOCAL_TIME</span>
+            <span id="sys-clock" class="text-rhine-dark font-bold">--:--:--</span>
+        </div>
+    </div>
+</aside>
+
+<!-- 移动端简易导航 -->
+<div class="md:hidden fixed top-0 w-full h-14 bg-white/90 backdrop-blur border-b border-gray-200 z-50 flex items-center justify-between px-4">
+    <span class="font-bold text-rhine-dark">CITAZZZ</span>
+    <div class="flex gap-4 text-xs font-mono">
+        <a href="/">HOME</a>
+        <a href="/blog">BLOG</a>
+        <a href="/profile">ME</a>
+    </div>
+</div>
+
+<script>
+    function updateClock() {
+        const clock = document.getElementById('sys-clock');
+        if(clock) {
+            clock.innerText = new Date().toLocaleTimeString('en-US', {hour12:false});
+        }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>

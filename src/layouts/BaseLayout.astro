@@ -1,0 +1,38 @@
+---
+import { ViewTransitions } from 'astro:transitions';
+import Sidebar from '../components/Sidebar.astro';
+import '../styles/global.css'; 
+// 1. 引入光标组件
+import CustomCursor from '../components/ui/CustomCursor.jsx';
+
+const { title } = Astro.props;
+---
+
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>{title} // CITAZZZ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <ViewTransitions />
+  </head>
+  <body class="bg-rhine-bg text-rhine-dark font-sans" style="cursor: none;">
+    
+    <!-- 2. 放置光标组件，使用 client:only="react" -->
+    <!-- client:only 很重要，因为它完全依赖浏览器 API，不需要服务端渲染 -->
+    <CustomCursor client:only="react" />
+
+    <Sidebar />
+
+    <main class="md:pl-64 min-h-screen flex flex-col transition-all duration-300">
+        <div class="flex-1 p-6 md:p-12 max-w-5xl mx-auto w-full pt-20 md:pt-12">
+            <slot /> 
+        </div>
+        
+        <footer class="py-8 text-center text-xs text-gray-400 font-mono border-t border-gray-200 mx-6 md:mx-12">
+            © 2025 CITAZZZ // PEKING UNIVERSITY
+        </footer>
+    </main>
+
+  </body>
+</html>

@@ -1,0 +1,67 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  return posts.map((post: { slug: any; }) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+// 1. 定义类型，解决 implicit any 报错
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<BaseLayout title={post.data.title}>
+    <article class="bg-white border border-gray-200 p-8 md:p-16 shadow-sm min-h-[80vh]">
+        <!-- 文章头部信息 -->
+        <header class="mb-12 border-b border-gray-100 pb-8">
+            <div class="flex gap-2 mb-4">
+                {post.data.tags.map((tag: unknown) => (
+                    <a 
+                        href={`/blog?tag=${tag}`} 
+                        class="bg-rhine-dark text-white text-[10px] px-2 py-1 font-mono hover:bg-rhine-green hover:text-rhine-dark transition-colors cursor-pointer"
+                    >
+                        {tag}
+                    </a>
+                ))}
+            </div>
+            <h1 class="text-3xl md:text-5xl font-black text-rhine-dark mb-4 leading-tight">{post.data.title}</h1>
+            <div class="text-sm font-mono text-gray-400 flex gap-4">
+                <span>DATE: {post.data.pubDate.toISOString().slice(0,10)}</span>
+                <span>AUTHOR: CITAZZZ</span>
+            </div>
+        </header>
+
+        <!-- 2. 【关键修改】这里加入了详细的排版样式类 -->
+        <div class="
+            prose 
+            prose-slate 
+            max-w-none 
+            prose-headings:font-black 
+            prose-headings:text-rhine-dark 
+            prose-a:text-rhine-green 
+            prose-a:no-underline 
+            prose-a:hover:underline
+            prose-pre:bg-rhine-dark 
+            prose-pre:rounded-sm 
+            prose-blockquote:border-l-rhine-green
+        ">
+            <Content />
+        </div>
+    </article>
+    
+    <!-- 返回按钮 -->
+    <div class="mt-8">
+        <a href="/blog" class="inline-flex items-center gap-2 text-sm font-mono text-gray-500 hover:text-rhine-green transition-colors">
+            {'<'} RETURN_TO_ARCHIVES
+        </a>
+    </div>
+</BaseLayout>
