@@ -1,6 +1,5 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-// 1. 引入 Mail 图标
 import { Github, Terminal, Cpu, Layers, ExternalLink, MapPin, User, Mail, Zap, Coffee } from 'lucide-react';
 
 const bio = {
@@ -8,36 +7,17 @@ const bio = {
   role: "Developer / Student",
   id: "PKU_CS_2025",
   location: "Beijing, CN",
-  // 2. 在这里填写你的邮箱
   email: "citazzz@outlook.com", 
   intro: `北京大学元培学院 2025 级本科生，主修计算机科学与技术。`
 };
 
-// 定义默认数据变量
-let githubProfile = {
+// 这里的默认值只起占位作用，实际数据由底部的 Script 填充
+const defaultGithub = {
   username: "Citazzz",
   url: "https://github.com/Citazzz",
-  public_repos: 0,     
-  followers: 0,        
-  bio: "Loading..."    
+  repos: "Loading...",
+  followers: "Loading..."
 };
-
-// 构建时获取真实数据
-try {
-  const res = await fetch('https://api.github.com/users/Citazzz');
-  if (res.ok) {
-    const data = await res.json();
-    githubProfile = {
-      username: data.login,
-      url: data.html_url,
-      public_repos: data.public_repos, 
-      followers: data.followers,       
-      bio: data.bio || "No bio available"
-    };
-  }
-} catch (error) {
-  console.error("GitHub API fetch failed:", error);
-}
 
 interface Project {
   name: string;
@@ -48,7 +28,7 @@ interface Project {
 }
 
 const projects: Project[] = [
-    // 这里暂时为空，等待你添加项目
+    // 你的项目列表...
 ];
 
 const getStatusColor = (status: string) => {
@@ -67,12 +47,6 @@ const getStatusColor = (status: string) => {
         <p class="text-xs font-mono text-gray-400 mt-1">PERSONNEL_FILE // {bio.id}</p>
       </div>
       <div class="hidden md:block text-right">
-        <!-- 
-            🟢 彩蛋修改处：
-            1. div 改为 a 标签
-            2. 加上 href 跳转链接
-            3. 加上 hover 变色效果，提示用户可点击
-        -->
         <a 
             href="https://space.bilibili.com/399918500?spm_id_from=333.337.0.0" 
             target="_blank" 
@@ -94,7 +68,6 @@ const getStatusColor = (status: string) => {
            <div class="p-6 relative z-0">
               <div class="flex justify-between items-start mb-6">
                 <div class="w-20 h-20 bg-gray-100 border border-gray-300 flex items-center justify-center text-gray-400 overflow-hidden">
-                    <!-- 确保 public 文件夹下有 profilePic.png -->
                     <img src="/profilePic.png" alt="Citazzz Avatar" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500" />
                 </div>
                 <div class="text-right">
@@ -104,13 +77,11 @@ const getStatusColor = (status: string) => {
               </div>
 
               <div class="space-y-3 font-mono text-sm text-gray-600">
-                <!-- 地理位置 -->
                 <div class="flex items-center gap-3">
                     <MapPin size={14} />
                     <span>{bio.location}</span>
                 </div>
 
-                <!-- 3. 联系方式 -->
                 <a href={`mailto:${bio.email}`} class="flex items-center gap-3 hover:text-rhine-green transition-colors group/email cursor-pointer">
                     <Mail size={14} className="group-hover/email:text-rhine-green transition-colors" />
                     <span>{bio.email}</span>
@@ -133,7 +104,7 @@ const getStatusColor = (status: string) => {
         </div>
 
         <!-- Github 卡片 -->
-        <a href={githubProfile.url} target="_blank" class="block bg-rhine-dark text-gray-300 p-6 font-mono text-xs relative overflow-hidden group border border-rhine-dark hover:border-rhine-green transition-colors">
+        <a href={defaultGithub.url} target="_blank" class="block bg-rhine-dark text-gray-300 p-6 font-mono text-xs relative overflow-hidden group border border-rhine-dark hover:border-rhine-green transition-colors">
             <div class="absolute top-3 right-3 text-rhine-green opacity-20 group-hover:opacity-100 transition-opacity">
                 <Github size={24} />
             </div>
@@ -148,7 +119,7 @@ const getStatusColor = (status: string) => {
                     <span class="text-blue-400">~</span>
                     <span>whoami</span>
                 </div>
-                <div class="pl-4 text-white font-bold">{githubProfile.username}</div>
+                <div class="pl-4 text-white font-bold">{defaultGithub.username}</div>
                 
                 <div class="flex gap-2 pt-2">
                     <span class="text-rhine-green">➜</span>
@@ -159,8 +130,9 @@ const getStatusColor = (status: string) => {
                     On branch main<br>
                     Your branch is up to date with 'origin/main'.<br>
                     <br>
-                    <span class="text-rhine-green">Public Repos: {githubProfile.public_repos}</span><br>
-                    <span class="text-rhine-green">Followers: {githubProfile.followers}</span>
+                    <!-- 🟢 关键修改：添加 id，供下方 script 填充数据 -->
+                    <span class="text-rhine-green">Public Repos: <span id="gh-repos" class="text-white">...</span></span><br>
+                    <span class="text-rhine-green">Followers: <span id="gh-followers" class="text-white">...</span></span>
                 </div>
                 
                 <div class="flex gap-2 pt-2 group-hover:animate-pulse">
@@ -173,10 +145,8 @@ const getStatusColor = (status: string) => {
         <!-- Sponsor 能量模块 -->
         <div class="mt-4">
             <details class="group relative">
-                <!-- 1. 交互按钮 (Summary) -->
                 <summary class="list-none [&::-webkit-details-marker]:hidden cursor-pointer">
                     <div class="bg-rhine-surface border border-gray-300 p-4 flex items-center justify-between hover:border-rhine-green hover:shadow-[0_0_15px_rgba(140,198,63,0.2)] transition-all duration-300 group-open:bg-rhine-dark group-open:border-rhine-dark group-open:text-white">
-                        
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-gray-100 rounded-sm flex items-center justify-center text-gray-400 group-hover:bg-rhine-green group-hover:text-black group-open:bg-rhine-green group-open:text-black transition-colors">
                                 <Zap size={16} className="fill-current" />
@@ -186,8 +156,6 @@ const getStatusColor = (status: string) => {
                                 <span class="text-[10px] font-mono text-gray-400 group-hover:text-rhine-green/70">STATUS: AWAITING</span>
                             </div>
                         </div>
-
-                        <!-- 右侧指示器：加号变减号 -->
                         <div class="font-mono text-xs text-gray-400 group-hover:text-rhine-green group-open:text-rhine-green">
                             <span class="block group-open:hidden">[+]</span>
                             <span class="hidden group-open:block">[-]</span>
@@ -195,33 +163,23 @@ const getStatusColor = (status: string) => {
                     </div>
                 </summary>
 
-                <!-- 2. 展开后的内容 (Content) -->
                 <div class="bg-rhine-dark border-x border-b border-gray-800 p-4 animate-in slide-in-from-top-2 duration-300">
                     <p class="text-[10px] font-mono text-gray-400 mb-4 leading-relaxed">
                         // SYSTEM_LOG:<br>
                         感谢对本终端和Citazzz贡献的开源项目的支持。您的赞助将用于维持服务器运行。
                     </p>
-                    
                     <div class="grid grid-cols-2 gap-3">
-                        <!-- 选项 A: 链接跳转 (默认显示亮灰色，悬停变绿) -->
                         <a href="https://www.buymeacoffee.com/citazzz" target="_blank" class="flex flex-col items-center justify-center gap-2 p-3 border border-gray-600 bg-gray-900 text-gray-300 hover:border-rhine-green hover:text-rhine-green hover:bg-rhine-green/10 transition-all cursor-pointer">
                             <Coffee size={20} />
                             <span class="text-[10px] font-bold">BUY COFFEE</span>
                         </a>
-
-                        <!-- 选项 B: 微信/支付宝 (默认显示亮灰色，悬停变绿并弹出二维码) -->
-                        <div class="relative group/qr flex flex-col items-center justify-center gap-2 p-3 border border-gray-600 bg-gray-900 text-gray-300 hover:border-rhine-green hover:text-rhine-green hover:bg-rhine-green/10 transition-all cursor-pointer">
-                            <!-- 这里用人民币符号作为图标 -->
+                        <div tabindex="0" class="relative group/qr flex flex-col items-center justify-center gap-2 p-3 border border-gray-600 bg-gray-900 text-gray-300 hover:border-rhine-green hover:text-rhine-green hover:bg-rhine-green/10 focus:border-rhine-green focus:text-rhine-green focus:bg-rhine-green/10 focus:outline-none transition-all cursor-pointer">
                             <span class="text-xl font-bold leading-none">¥</span>
                             <span class="text-[10px] font-bold">WECHAT</span>
-
-                            <!-- 悬停时弹出的二维码浮层 -->
-                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-36 p-1 bg-white border-2 border-rhine-green opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible transition-all duration-300 z-50 shadow-[0_0_20px_rgba(140,198,63,0.3)]">
-                                <!-- 二维码图片 -->
-                                <img src="/qr.png" alt="QR Code" class="w-full h-auto block" />
-                                <div class="text-[8px] text-center text-black bg-rhine-green font-bold py-1 mt-1">SCAN TO PAY</div>
-                                
-                                <!-- 下方的小三角箭头 -->
+                            <div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-40 p-1 bg-white border-2 border-rhine-green opacity-0 invisible group-hover/qr:opacity-100 group-hover/qr:visible group-focus/qr:opacity-100 group-focus/qr:visible transition-all duration-300 z-50 shadow-[0_0_20px_rgba(140,198,63,0.3)]">
+                                <img src="/qr.png" alt="QR Code" class="w-full h-auto block select-none" />
+                                <div class="hidden md:block text-[8px] text-center text-black bg-rhine-green font-bold py-1 mt-1">SCAN TO PAY</div>
+                                <div class="md:hidden text-[8px] text-center text-black bg-rhine-green font-bold py-1 mt-1">TAP / LONG PRESS</div>
                                 <div class="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[6px] border-t-rhine-green"></div>
                             </div>
                         </div>
@@ -249,25 +207,16 @@ const getStatusColor = (status: string) => {
                             </div>
                             <ExternalLink size={16} className="text-gray-300 group-hover:text-rhine-green transition-colors" />
                         </div>
-                        
-                        <h3 class="text-lg font-bold text-rhine-dark mb-2 flex items-center gap-2">
-                            {project.name}
-                        </h3>
-                        <p class="text-sm text-gray-500 leading-relaxed mb-6">
-                            {project.desc}
-                        </p>
+                        <h3 class="text-lg font-bold text-rhine-dark mb-2 flex items-center gap-2">{project.name}</h3>
+                        <p class="text-sm text-gray-500 leading-relaxed mb-6">{project.desc}</p>
                     </div>
-
                     <div class="flex flex-wrap gap-2 mt-auto">
                         {project.tech.map((t) => (
-                            <span class="text-[10px] font-mono text-gray-400 bg-gray-50 px-2 py-1 group-hover:bg-rhine-bg group-hover:text-rhine-dark transition-colors">
-                                #{t}
-                            </span>
+                            <span class="text-[10px] font-mono text-gray-400 bg-gray-50 px-2 py-1 group-hover:bg-rhine-bg group-hover:text-rhine-dark transition-colors">#{t}</span>
                         ))}
                     </div>
                 </a>
             ))}
-
             <div class="border border-dashed border-gray-300 p-6 flex flex-col items-center justify-center text-gray-400 gap-2 min-h-[200px]">
                 <Cpu size={32} className="opacity-20" />
                 <span class="text-xs font-mono">AWAITING_NEW_MISSION...</span>
@@ -278,3 +227,29 @@ const getStatusColor = (status: string) => {
     </div>
   </div>
 </BaseLayout>
+
+<!-- 🟢 关键新增：客户端数据获取脚本 -->
+<script>
+    // 这里的代码会在用户的浏览器里运行，而不是在服务器上
+    async function fetchGithubData() {
+        const repoEl = document.getElementById('gh-repos');
+        const followerEl = document.getElementById('gh-followers');
+        
+        try {
+            const res = await fetch('https://api.github.com/users/Citazzz');
+            if (res.ok) {
+                const data = await res.json();
+                if (repoEl) repoEl.innerText = data.public_repos;
+                if (followerEl) followerEl.innerText = data.followers;
+            } else {
+                if (repoEl) repoEl.innerText = "Err";
+                if (followerEl) followerEl.innerText = "Err";
+            }
+        } catch (e) {
+            console.error("GitHub Fetch Error", e);
+        }
+    }
+
+    // 页面加载后执行
+    fetchGithubData();
+</script>
