@@ -230,26 +230,41 @@ const getStatusColor = (status: string) => {
 
 <!-- 🟢 关键新增：客户端数据获取脚本 -->
 <script>
-    // 这里的代码会在用户的浏览器里运行，而不是在服务器上
+    // 定义获取数据的函数
     async function fetchGithubData() {
         const repoEl = document.getElementById('gh-repos');
         const followerEl = document.getElementById('gh-followers');
         
+        // 如果当前页面找不到这两个元素（说明可能不在 Profile 页，或者还没渲染好），直接退出
+        if (!repoEl || !followerEl) return;
+
+        // 显示加载状态
+        repoEl.innerText = "...";
+        followerEl.innerText = "...";
+        
         try {
             const res = await fetch('https://api.github.com/users/Citazzz');
+            
             if (res.ok) {
                 const data = await res.json();
-                if (repoEl) repoEl.innerText = data.public_repos;
-                if (followerEl) followerEl.innerText = data.followers;
+                repoEl.innerText = data.public_repos;
+                followerEl.innerText = data.followers;
             } else {
-                if (repoEl) repoEl.innerText = "Err";
-                if (followerEl) followerEl.innerText = "Err";
+                console.error("GitHub API Limit Reached or Error");
+                repoEl.innerText = "Err";
+                followerEl.innerText = "Err";
             }
         } catch (e) {
-            console.error("GitHub Fetch Error", e);
+            console.error("Network Error:", e);
+            repoEl.innerText = "N/A";
+            followerEl.innerText = "N/A";
         }
     }
 
-    // 页面加载后执行
+    // 1. 立即执行一次（为了应对直接刷新 Profile 页面的情况）
     fetchGithubData();
+
+    // 2. 【关键修复】监听 Astro 的页面加载事件
+    // 这样每次你从首页点进 Profile，这个函数都会重新跑一次
+    document.addEventListener('astro:page-load', fetchGithubData);
 </script>
