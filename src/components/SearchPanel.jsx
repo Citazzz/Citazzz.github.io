@@ -247,6 +247,7 @@ export default function SearchPanel({ posts }) {
                 type="date"
                 value={startDate}
                 onChange={(e) => handleDateChange('start', e.target.value)}
+                max="9999-12-31"
                 className="bg-black/30 text-white border border-gray-600 px-3 py-1.5 text-xs font-mono focus:border-rhine-green focus:outline-none transition-colors"
               />
             </div>
@@ -256,6 +257,7 @@ export default function SearchPanel({ posts }) {
                 type="date"
                 value={endDate}
                 onChange={(e) => handleDateChange('end', e.target.value)}
+                max="9999-12-31"
                 className="bg-black/30 text-white border border-gray-600 px-3 py-1.5 text-xs font-mono focus:border-rhine-green focus:outline-none transition-colors"
               />
             </div>
