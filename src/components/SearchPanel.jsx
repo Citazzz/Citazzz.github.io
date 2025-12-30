@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react'; // 引入关闭图标用于清空标签
+import DateInput from './ui/DateInput.jsx';
 
 // --- 1. 内部组件：高亮文本渲染器 (保持不变) ---
 const HighlightText = ({ text, query }) => {
@@ -149,22 +150,24 @@ export default function SearchPanel({ posts }) {
   };
 
   // 日期变化处理
-  const handleDateChange = (type, value) => {
+  const handleStartDateChange = (value) => {
+    setStartDate(value);
     const url = new URL(window.location);
-    if (type === 'start') {
-      setStartDate(value);
-      if (value) {
-        url.searchParams.set('start', value);
-      } else {
-        url.searchParams.delete('start');
-      }
+    if (value) {
+      url.searchParams.set('start', value);
     } else {
-      setEndDate(value);
-      if (value) {
-        url.searchParams.set('end', value);
-      } else {
-        url.searchParams.delete('end');
-      }
+      url.searchParams.delete('start');
+    }
+    window.history.pushState({}, '', url);
+  };
+
+  const handleEndDateChange = (value) => {
+    setEndDate(value);
+    const url = new URL(window.location);
+    if (value) {
+      url.searchParams.set('end', value);
+    } else {
+      url.searchParams.delete('end');
     }
     window.history.pushState({}, '', url);
   };
@@ -240,25 +243,19 @@ export default function SearchPanel({ posts }) {
              )}
           </div>
 
-          <div className="flex flex-wrap gap-2 items-center">
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-mono text-gray-400">FROM:</label>
-              <input 
-                type="date"
-                value={startDate}
-                onChange={(e) => handleDateChange('start', e.target.value)}
-                className="bg-black/30 text-white border border-gray-600 px-3 py-1.5 text-xs font-mono focus:border-rhine-green focus:outline-none transition-colors"
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <label className="text-xs font-mono text-gray-400">TO:</label>
-              <input 
-                type="date"
-                value={endDate}
-                onChange={(e) => handleDateChange('end', e.target.value)}
-                className="bg-black/30 text-white border border-gray-600 px-3 py-1.5 text-xs font-mono focus:border-rhine-green focus:outline-none transition-colors"
-              />
-            </div>
+          <div className="flex flex-wrap gap-4 items-center">
+            <DateInput
+              label="FROM:"
+              value={startDate}
+              onChange={handleStartDateChange}
+              placeholder="YYYY-MM-DD"
+            />
+            <DateInput
+              label="TO:"
+              value={endDate}
+              onChange={handleEndDateChange}
+              placeholder="YYYY-MM-DD"
+            />
           </div>
         </div>
       </div>
