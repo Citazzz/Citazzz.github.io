@@ -281,13 +281,18 @@ export default function SearchPanel({ posts }) {
                <div className="relative z-10">
                  <div className="flex gap-2 mb-2 flex-wrap">
                     {post.data.tags.map(tag => (
-                        <span 
-                            key={tag} 
+                        <button
+                            key={tag}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              window.location.href = `/blog?tags=${tag}`;
+                            }}
                             // 如果这个 tag 被选中了，高亮显示，方便用户一眼看出匹配原因
-                            className={`text-[10px] font-mono px-1 transition-colors ${selectedTags.includes(tag) ? 'bg-rhine-green text-black' : 'bg-gray-100 text-gray-500'}`}
+                            className={`text-[10px] font-mono px-1 transition-colors hover:opacity-80 cursor-pointer ${selectedTags.includes(tag) ? 'bg-rhine-green text-black' : 'bg-gray-100 text-gray-500'}`}
                         >
                             {tag}
-                        </span>
+                        </button>
                     ))}
                  </div>
 

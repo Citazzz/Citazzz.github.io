@@ -70,8 +70,26 @@ export default function DateInput({ value, onChange, placeholder = 'YYYY-MM-DD',
     const dateRegex = /^\d{4}-\d{1,2}-\d{1,2}$/;
     if (!dateRegex.test(dateStr)) return false;
     
-    const date = new Date(dateStr);
-    return !isNaN(date.getTime());
+    // Parse and validate the actual date
+    const parts = dateStr.split('-');
+    const year = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const day = parseInt(parts[2], 10);
+    
+    // Check month and day ranges
+    if (month < 1 || month > 12) return false;
+    if (day < 1 || day > 31) return false;
+    
+    // Create date and verify it matches the input
+    // This catches invalid dates like Feb 31
+    const date = new Date(year, month - 1, day);
+    if (date.getFullYear() !== year || 
+        date.getMonth() !== month - 1 || 
+        date.getDate() !== day) {
+      return false;
+    }
+    
+    return true;
   };
 
   // Handle input change
@@ -98,8 +116,10 @@ export default function DateInput({ value, onChange, placeholder = 'YYYY-MM-DD',
       onChange(normalized);
       setHasError(false);
     } else {
+      // Clear the invalid input
+      setInputValue('');
+      onChange('');
       setHasError(true);
-      // Don't update parent with invalid date
     }
   };
 
