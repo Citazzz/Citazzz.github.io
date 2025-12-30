@@ -26,7 +26,7 @@ const { Content } = await post.render();
             <div class="flex gap-2 mb-4">
                 {post.data.tags.map((tag: unknown) => (
                     <a 
-                        href={`/blog?tag=${tag}`} 
+                        href={`/blog?tags=${tag}`} 
                         class="bg-rhine-dark text-white text-[10px] px-2 py-1 font-mono hover:bg-rhine-green hover:text-rhine-dark transition-colors cursor-pointer"
                     >
                         {tag}
