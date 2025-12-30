@@ -69,18 +69,17 @@ export default function SearchPanel({ posts }) {
 
     // 步骤 A.5: 日期范围筛选
     if (startDate || endDate) {
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      if (end) {
+        // 包含结束日期当天的所有时间
+        end.setHours(23, 59, 59, 999);
+      }
+      
       results = results.filter(post => {
         const postDate = new Date(post.data.pubDate);
-        if (startDate) {
-          const start = new Date(startDate);
-          if (postDate < start) return false;
-        }
-        if (endDate) {
-          // 包含结束日期当天的所有时间
-          const end = new Date(endDate);
-          end.setHours(23, 59, 59, 999);
-          if (postDate > end) return false;
-        }
+        if (start && postDate < start) return false;
+        if (end && postDate > end) return false;
         return true;
       });
     }
