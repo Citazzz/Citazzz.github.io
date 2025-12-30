@@ -29,6 +29,9 @@ export default function SearchPanel({ posts }) {
   const [query, setQuery] = useState('');
   // 🟢 修改：使用数组存储多选标签
   const [selectedTags, setSelectedTags] = useState([]);
+  // 🟢 新增：日期范围筛选
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // --- URL 参数同步逻辑 (支持多选) ---
   useEffect(() => {
@@ -38,6 +41,11 @@ export default function SearchPanel({ posts }) {
       // 将字符串 "A,B" 转为数组 ["A", "B"]
       setSelectedTags(tagsParam.split(',').filter(Boolean));
     }
+    // 同步日期参数
+    const startParam = params.get('start');
+    const endParam = params.get('end');
+    if (startParam) setStartDate(startParam);
+    if (endParam) setEndDate(endParam);
   }, []);
 
   // 提取所有 Tag
@@ -57,6 +65,23 @@ export default function SearchPanel({ posts }) {
         // 检查 selectedTags 里的每一个 tag，文章是否都有
         selectedTags.every(tag => post.data.tags.includes(tag))
       );
+    }
+
+    // 步骤 A.5: 日期范围筛选
+    if (startDate || endDate) {
+      const start = startDate ? new Date(startDate) : null;
+      const end = endDate ? new Date(endDate) : null;
+      if (end) {
+        // 包含结束日期当天的所有时间
+        end.setHours(23, 59, 59, 999);
+      }
+      
+      results = results.filter(post => {
+        const postDate = new Date(post.data.pubDate);
+        if (start && postDate < start) return false;
+        if (end && postDate > end) return false;
+        return true;
+      });
     }
 
     // 步骤 B: 搜索词打分排序
@@ -90,7 +115,7 @@ export default function SearchPanel({ posts }) {
 
     return scoredResults;
 
-  }, [query, selectedTags, posts]);
+  }, [query, selectedTags, startDate, endDate, posts]);
 
   // --- 标签点击处理 ---
   const toggleTag = (tag) => {
@@ -120,6 +145,37 @@ export default function SearchPanel({ posts }) {
     setSelectedTags([]);
     const url = new URL(window.location);
     url.searchParams.delete('tags');
+    window.history.pushState({}, '', url);
+  };
+
+  // 日期变化处理
+  const handleDateChange = (type, value) => {
+    const url = new URL(window.location);
+    if (type === 'start') {
+      setStartDate(value);
+      if (value) {
+        url.searchParams.set('start', value);
+      } else {
+        url.searchParams.delete('start');
+      }
+    } else {
+      setEndDate(value);
+      if (value) {
+        url.searchParams.set('end', value);
+      } else {
+        url.searchParams.delete('end');
+      }
+    }
+    window.history.pushState({}, '', url);
+  };
+
+  // 清空日期
+  const clearDates = () => {
+    setStartDate('');
+    setEndDate('');
+    const url = new URL(window.location);
+    url.searchParams.delete('start');
+    url.searchParams.delete('end');
     window.history.pushState({}, '', url);
   };
 
@@ -170,6 +226,39 @@ export default function SearchPanel({ posts }) {
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        {/* 日期范围过滤器 */}
+        <div className="space-y-2 mt-6">
+          <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 mb-2">
+             <span>FILTER_BY_DATE</span>
+             {(startDate || endDate) && (
+                <button onClick={clearDates} className="text-rhine-green hover:underline flex items-center gap-1">
+                   CLEAR <X size={10} />
+                </button>
+             )}
+          </div>
+
+          <div className="flex flex-wrap gap-2 items-center">
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-mono text-gray-400">FROM:</label>
+              <input 
+                type="date"
+                value={startDate}
+                onChange={(e) => handleDateChange('start', e.target.value)}
+                className="bg-black/30 text-white border border-gray-600 px-3 py-1.5 text-xs font-mono focus:border-rhine-green focus:outline-none transition-colors"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs font-mono text-gray-400">TO:</label>
+              <input 
+                type="date"
+                value={endDate}
+                onChange={(e) => handleDateChange('end', e.target.value)}
+                className="bg-black/30 text-white border border-gray-600 px-3 py-1.5 text-xs font-mono focus:border-rhine-green focus:outline-none transition-colors"
+              />
+            </div>
           </div>
         </div>
       </div>
