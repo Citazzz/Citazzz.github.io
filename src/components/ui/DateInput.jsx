@@ -48,7 +48,8 @@ export default function DateInput({ value, onChange, placeholder = '---- -- --',
   };
 
   // Parse current value to Date object for calendar
-  const selectedDate = value ? new Date(value) : undefined;
+  // Value is always in YYYY-MM-DD format from our handlers
+  const selectedDate = value ? new Date(value + 'T00:00:00') : undefined;
 
   // Display value (date or placeholder)
   const displayValue = value || placeholder;
@@ -98,6 +99,7 @@ export default function DateInput({ value, onChange, placeholder = '---- -- --',
               month: "space-y-4 p-3",
               month_caption: "flex justify-center pt-1 relative items-center text-sm font-mono text-rhine-green mb-2",
               nav: "flex items-center",
+              // Navigation buttons share styles but differ in positioning (left-1 vs right-1)
               button_previous: "absolute left-1 h-8 w-8 bg-transparent p-0 flex items-center justify-center text-gray-400 hover:text-rhine-green hover:bg-rhine-green/10 transition-all rounded border border-transparent hover:border-rhine-green/30",
               button_next: "absolute right-1 h-8 w-8 bg-transparent p-0 flex items-center justify-center text-gray-400 hover:text-rhine-green hover:bg-rhine-green/10 transition-all rounded border border-transparent hover:border-rhine-green/30",
               month_grid: "w-full border-collapse space-y-1",
