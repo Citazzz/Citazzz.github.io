@@ -96,6 +96,9 @@ export default function DateInput({ value, onChange, placeholder = 'YYYY-MM-DD',
             mode="single"
             selected={selectedDate}
             onSelect={handleDaySelect}
+            captionLayout="dropdown"
+            fromYear={2010}
+            toYear={new Date().getFullYear() + 5}
             className="rdp-custom"
             components={{
               // Custom navigation icons with proper styling
@@ -109,7 +112,9 @@ export default function DateInput({ value, onChange, placeholder = 'YYYY-MM-DD',
             classNames={{
               months: "flex flex-col",
               month: "space-y-4 p-3",
-              month_caption: "flex justify-center pt-1 relative items-center text-sm font-mono text-rhine-green mb-2",
+              month_caption: "flex justify-center pt-1 relative items-center text-sm font-mono text-rhine-green mb-2 px-10",
+              caption_dropdowns: "flex gap-2 items-center justify-center mx-auto",
+              dropdown: "bg-black/30 border border-gray-600 text-rhine-green text-xs font-mono px-2 py-1 hover:border-rhine-green focus:outline-none focus:border-rhine-green transition-all",
               nav: "flex items-center",
               button_previous: "absolute left-1 h-8 w-8 bg-black/30 border border-gray-600 hover:border-rhine-green hover:bg-black/50 p-0 flex items-center justify-center text-gray-400 hover:text-rhine-green transition-all",
               button_next: "absolute right-1 h-8 w-8 bg-black/30 border border-gray-600 hover:border-rhine-green hover:bg-black/50 p-0 flex items-center justify-center text-gray-400 hover:text-rhine-green transition-all",
