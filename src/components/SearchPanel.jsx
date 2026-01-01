@@ -248,13 +248,13 @@ export default function SearchPanel({ posts }) {
               label="FROM:"
               value={startDate}
               onChange={handleStartDateChange}
-              placeholder="YYYY-MM-DD"
+              placeholder="---- -- --"
             />
             <DateInput
               label="TO:"
               value={endDate}
               onChange={handleEndDateChange}
-              placeholder="YYYY-MM-DD"
+              placeholder="---- -- --"
             />
           </div>
         </div>
